@@ -22,6 +22,7 @@ body {
 
 #chat-container {
     display: grid;
+    display: none;
     grid: "search-container chat-title" 71px "participants-list chat-message-list" 1fr "new-message-container chat-form" 78px / 275px 1fr;
     min-width: 800px;
     max-width: 1000px;
@@ -34,7 +35,8 @@ body {
 
 #search-container,
 #participants-list,
-#new-message-container {
+#new-message-container,
+#create-chat {
     background: #0048aa;
 }
 
@@ -114,21 +116,6 @@ body {
     text-overflow: ellipsis;
 }
 
-
-/* .created-date {
-    color: #ddd;
-    font-size: 1rem;
-} */
-
-
-/* .conversation-message {
-    grid-column: span 2;
-    padding-left: 5px;
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-} */
-
 #new-message-container {
     display: grid;
     grid: 40px / 40px;
@@ -204,12 +191,6 @@ body {
     margin-bottom: 5px;
 }
 
-
-/* .message-time {
-    font-size: 1.3rem;
-    color: #777;
-} */
-
 .you-message .message-text {
     background: #004baa;
     color: #eee;
@@ -264,4 +245,65 @@ body {
     border-top: 1px solid rgba(0, 0, 0, 0.25);
     border-radius: 0 0 0 10px;
     padding: 0 20px;
+}
+
+#dashboard-container {
+    display: grid;
+    grid: "top-space1 top-space2" 40px "create-chat search-chat" 1fr / 1fr 1fr;
+    min-width: 800px;
+    max-width: 1000px;
+    max-height: 800px;
+    width: 100%;
+    height: 95vh;
+    background: #fff;
+    border-radius: 10px;
+}
+
+.create-title{
+    padding: 10px;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    font-size: 30px;
+}
+
+.input{
+    width: 100%;
+    padding: 5px;
+    text-align: center;
+    border: none;
+}
+
+#create-public-container{
+    width: 80%;
+    display: grid;
+    grid: "create-public-input create-public-submit" / 1fr 50px;
+}
+
+#create-pvt-container{
+    width: 80%;
+    display: grid;
+    grid: "create-pvt-input create-pvt-submit" / 1fr 50px;
+}
+
+.submit{
+    border: none;
+    background:#eee;
+    cursor:pointer;
+}
+
+#top-space1, #top-space2{
+    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.75);
+    z-index: 1;
+    background: #eee;
+}
+
+.center{
+    display: flex;
+    justify-content: center;
+}
+
+#create-chat{
+    display: grid;
 }
