@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>ChatJS</title>
+        <link rel="stylesheet" type="text/css" href="/css/chat.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/js/chat.js"></script>
+    </head>
+    <body>
+        <div id="chat-container">
+            <div id="search-container">
+                <input type="text" placeholder="Search" />
+            </div>
+            <div id="participants-list">
+                <% chat.forEach(function(chat, index){ %>
+                    <% if (index == 0){ %>
+                        <div class="participant selected" value = "<%= chat._id %>">
+                    <% } else { %>
+                        <div class="participant" value = "<%= chat._id %>">
+                    <% } %>
+                        <img src="./images/groups2.png"/>
+                        <div class="name">
+                            <%= chat.name %>
+                        </div>
+                        <div class="created-date">
+                            <%= chat.name %>
+                        </div>
+                        <div class="conversation-message">
+                            <%= chat.name %>
+                        </div>
+                    </div>
+                <% }) %>
+
+            </div>
+            <div id="new-message-container">
+                <a href="/users/logout">
+                    <img src="/images/logout.jpg"/>
+                </a>
+            </div>
+            <div id="chat-title">
+                <span><%= chat[0].name %></span>
+            </div>
+            <div id="chat-message-list">
+
+                <% messages.forEach(function(message){ %>
+                    <% if (user._id.toString() == message.user_id.toString()){ %>
+                        <div class="message-row you-message">
+                            <div class="message-content">
+                                <div class="message-text">
+                                    <%= message.message %>
+                                </div>
+                                <div class="message-time">
+                                    <%= message.date.toLocaleString() %>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else{ %>
+                        <div class="message-row other-message">
+                            <div class="message-content">
+                                <span>
+                                    <%= message.name %>
+                                </span>
+                                <img src="./images/default.png"/> 
+                                <div class="message-text">
+                                    <%= message.message %>
+                                </div>
+                                <div class="message-time">
+                                    <%= message.date.toLocaleString() %>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }) %>
+
+            </div>
+            <form id="chat-form">
+                <input type="text" placeholder="type a message" id="message-input" autocomplete="off"/>
+                <input type="submit" />
+            </form>
+        </div>
+    </body>
+</html>

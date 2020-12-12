@@ -1,0 +1,30 @@
+<div class="row mt-5">
+    <div class="col-md-6 m-auto">
+        <div class="card card-body">
+            <h1 class="text-center mb-3">
+                <i class="fas fa-user-plus"></i> Register
+            </h1>
+            <% include ./partials/messages %>
+                <form action="/message/send" method="POST">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="name" id="name" name="name" class="form-control" placeholder="Enter Name" value="<%= typeof name != 'undefined' ? name : '' %>" />
+                    </div>
+                    <div class="form-group">
+                        <label for="user_id">user_id</label>
+                        <input type="user_id" id="user_id" name="user_id" class="form-control" placeholder="user_id" value="<%= typeof user_id != 'undefined' ? user_id : '' %>" />
+                    </div>
+                    <div class="form-group">
+                        <label for="chat_id">chat_id</label>
+                        <input type="chat_id" id="chat_id" name="chat_id" class="form-control" placeholder="Create chat_id" value="<%= typeof chat_id != 'undefined' ? chat_id : '' %>" />
+                    </div>
+                    <div class="form-group">
+                        <label for="message">message</label>
+                        <input type="message" id="message" name="message" class="form-control" placeholder="Confirm Password" value="<%= typeof message != 'undefined' ? message : '' %>" />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Send</button>
+                </form>
+                <p class="lead mt-4">Have An Account? <a href="/users/login">Login</a></p>
+        </div>
+    </div>
+</div>
