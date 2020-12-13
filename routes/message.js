@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
-const { forwardAuthenticated } = require("../config/auth");
 const Messages = require("../models/Messages");
+const Chat = require("../models/Chat");
 
 router.post("/send", (req, res) => {
     const newMsg = new Messages({
@@ -11,22 +10,30 @@ router.post("/send", (req, res) => {
         message: req.body.message,
         name: req.user.name
     });
-    newMsg.save()
-    res.end(JSON.stringify(newMsg))
+    newMsg.save(()=>{
+        Chat.updateOne({ _id: req.body.chat_id}, {last_msg: newMsg._id}).then(()=>{
+            res.end(JSON.stringify(newMsg))
+        })
+    })
 });
 
 router.get("/get", (req, res) => {
     var chat_id = req.url.substring(req.url.indexOf('=') + 1)
-    Messages.find({ chat_id: chat_id }).sort({date: "asc"}).then((messages) => {
-        var html = ''
-        for (var i=0; i<messages.length; i++){
-            if (req.user._id.toString() == messages[i].user_id.toString()){
-                html += '<div class="message-row you-message"><div class="message-content"><div class="message-text">' + messages[i].message + '</div><div class="message-time">' + messages[i].date.toLocaleString() + '</div></div></div>'
-            }else{
-                html += '<div class="message-row other-message"><div class="message-content"><span>'+messages[i].name+'</span><img src="./images/default.png"/><div class="message-text">' + messages[i].message + '</div><div class="message-time">' + messages[i].date.toLocaleString() + '</div></div></div>'
-            }
-        }
-        res.end(html)
+    Messages.find({ chat_id: chat_id }).sort({date: "asc"})
+    .populate('user_id')
+    .then((messages) => {
+
+        var resp = []
+        messages.forEach((msg) => {
+            resp.push({
+                author: msg.name,
+                content: msg.message,
+                date: msg.date.toLocaleString(),
+                icon: msg.user_id.icon,
+                is_self: msg.user_id.email == req.user.email
+            })
+        })
+        res.end(JSON.stringify(resp))
 
     })
 })

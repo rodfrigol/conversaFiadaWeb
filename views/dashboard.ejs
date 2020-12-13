@@ -9,37 +9,37 @@
         <script type="text/javascript" src="/js/chat.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
+    <script>
+        var txt = document.createElement("textarea");
+        txt.innerHTML = '<%= JSON.stringify(global_chat) %>';
+        global_chat = JSON.parse(txt.value)
+    </script>
     <body>
         <div id="chat-container">
             <div id="search-container">
                 <i class="fa fa-chevron-left arrow" id='goDashboard' style="font-size: 40px;color: grey;cursor:pointer;"></i>
             </div>
             <div id="participants-list">
-                <% chat.forEach(function(chat, index){ %>
-                    <% if (index == 0){ %>
-                        <div class="participant selected" value = "<%= chat._id %>">
+                <% global_chat.chats.forEach(function(chat){ %>
+                    <% if (chat.is_active){ %>
+                        <div class="participant selected" value = "<%= chat.chat_id %>">
                     <% } else { %>
-                        <div class="participant" value = "<%= chat._id %>">
+                        <div class="participant" value = "<%= chat.chat_id %>">
                     <% } %>
                     <% if (chat.is_pvt){ %>
                         <img src="./images/<%= chat.icon %>.png"/>
-                        <div class="name">
-                            <%= chat.name %>
-                        </div>
-                        <div class="created-date">
-                        </div>
-                        <div class="conversation-message">
-                        </div>
                     <% } else { %>
                         <img src="./images/groups2.png"/>
+                    <% } %>
                         <div class="name">
                             <%= chat.name %>
                         </div>
                         <div class="created-date">
+                            <%= chat.last_msg_time == null ? '' : chat.last_msg_time.toTimeString().split(' ')[0].substring(0, 5)  %>
                         </div>
                         <div class="conversation-message">
+                            <%= chat.last_msg_time == null ? '' : chat.last_msg_author + ': ' + chat.last_msg %>
                         </div>
-                    <% } %>
                     </div>
                 <% }) %>
 
@@ -50,16 +50,16 @@
                 </a>
             </div>
             <div id="chat-title">
-                <span><% if(chat.length>0){ %><%= chat[0].name %><% } %></span>
+                <span><%= global_chat.title %></span>
             </div>
             <div id="chat-message-list">
 
-                <% messages.forEach(function(message){ %>
-                    <% if (user._id.toString() == message.user_id.toString()){ %>
+                <% global_chat.msgs.forEach(function(message){ %>
+                    <% if (message.is_self){ %>
                         <div class="message-row you-message">
                             <div class="message-content">
                                 <div class="message-text">
-                                    <%= message.message %>
+                                    <%= message.content %>
                                 </div>
                                 <div class="message-time">
                                     <%= message.date.toLocaleString() %>
@@ -70,11 +70,11 @@
                         <div class="message-row other-message">
                             <div class="message-content">
                                 <span>
-                                    <%= message.name %>
+                                    <%= message.author %>
                                 </span>
-                                <img src="./images/default.png"/> 
+                                <img src="./images/<%= message.icon %>.png"/> 
                                 <div class="message-text">
-                                    <%= message.message %>
+                                    <%= message.content %>
                                 </div>
                                 <div class="message-time">
                                     <%= message.date.toLocaleString() %>

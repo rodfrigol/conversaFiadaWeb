@@ -4,11 +4,13 @@ const Schema = mongoose.Schema;
 const UserSchema = new mongoose.Schema({
   user_id: {
     type: Schema.Types.ObjectId,
-    required: true
+    required: true,
+    ref: 'User'
   },
   chat_id: {
     type: Schema.Types.ObjectId,
-    required: true
+    required: true,
+    ref: 'Chat'
   }
 });
 

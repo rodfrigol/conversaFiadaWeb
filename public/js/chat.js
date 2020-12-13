@@ -1,8 +1,4 @@
-var global_chat = {
-    chats: [],
-    title: '',
-    msgs: []
-}
+var global_chat = {}
 
 function scrollDown(id) {
     var el = document.getElementById(id);
@@ -47,10 +43,20 @@ function arrowClick(side){
     });
 }
 
-$(document).ready(function() {
+$(window).ready(function() {
     var socket = io.connect();
 
     function changeChatToElem(el){
+        var chat_id = el.getAttribute("value");
+        global_chat.chats.forEach(chat => {
+            if (chat_id.toString() === chat.chat_id){
+                chat.is_active = 1
+                global_chat.title = chat.name
+            }else{
+                chat.is_active = 0
+            }
+        })
+
         $(".selected").removeClass("selected");
         $(el).addClass("selected");
         var sala = $(el).find(".name").text();
@@ -62,7 +68,19 @@ $(document).ready(function() {
         $("#chat-title > span").text(el.children[1].innerText)
 
         $.get('message/get?chat_id=' + $('.selected').attr('value'), (data) => {
-            document.getElementById("chat-message-list").innerHTML = data
+            data = JSON.parse(data)
+            global_chat.msgs = data
+            var html = ''
+
+            for (var i=0; i<data.length; i++){
+                if (data[i].is_self){
+                    html += '<div class="message-row you-message"><div class="message-content"><div class="message-text">' + data[i].content + '</div><div class="message-time">' + data[i].date.toLocaleString() + '</div></div></div>'
+                }else{
+                    html += '<div class="message-row other-message"><div class="message-content"><span>'+data[i].author+'</span><img src="./images/'+data[i].icon+'.png"/><div class="message-text">' + data[i].content + '</div><div class="message-time">' + data[i].date.toLocaleString() + '</div></div></div>'
+                }
+            }
+
+            document.getElementById("chat-message-list").innerHTML = html
             document.getElementById(
                 "chat-message-list"
             ).scrollTop = document.getElementById("chat-message-list").scrollHeight;
@@ -96,17 +114,25 @@ $(document).ready(function() {
 
         $.post('/message/send', data, (res) => {
             var dados = JSON.parse(res)
+            global_chat.msgs.push({
+                author: dados.name,
+                content: dados.message,
+                date: dados.date,
+                icon: 1,
+                is_self: 1
+            })
 
             socket.emit("enviar mensagem", dados, function() {
                 $("#message-input").val("");
             });
             
             var mensagem_formatada = '<div class="message-row you-message"><div class="message-content"><div class="message-text">' + dados.message + '</div><div class="message-time">' + new Date(dados.date).toLocaleString() + '</div></div></div>'   
-
+            
             $("#chat-message-list").append(mensagem_formatada);
-            document.getElementById(
-                "chat-message-list"
-            ).scrollTop = document.getElementById("chat-message-list").scrollHeight;
+            $(".selected > .created-date").text(new Date(dados.date).toTimeString().split(' ')[0].substring(0, 5))
+            $(".selected > .conversation-message").text(dados.name + ': ' + dados.message)
+
+            scrollDown("chat-message-list")
         })
     });
 
@@ -118,11 +144,10 @@ $(document).ready(function() {
         el.scrollTop = el.scrollHeight;
     });
 
-    scrollDown("chat-message-list");
-
     $("#goChat").click(()=>{
         $("#dashboard-container").hide()
         $("#chat-container").css("display", "grid");
+        scrollDown("chat-message-list");
     })
 
     $("#goDashboard").click(()=>{
@@ -165,9 +190,24 @@ $(document).ready(function() {
                 if (data.errors.length === 0){
                     $("#dashboard-container").hide()
                     $("#chat-container").css("display", "grid");
+                    scrollDown("chat-message-list");
                     if(data.info.new){
                         $(".selected").removeClass("selected");
-
+                        global_chat.chats.forEach(chat => {
+                            chat.is_active = 0
+                        })
+                        global_chat.chats.push({
+                            chat_id: data.info.chat_id.toString(),
+                            icon: data.info.icon,
+                            is_active: 1,
+                            is_pvt: 1,
+                            last_msg: '',
+                            last_msg_author: '',
+                            last_msg_time: null,
+                            name: data.info.name
+                        })
+                        global_chat.title = data.info.name
+                        global_chat.msgs = []
                         var html = `<div class="participant selected" value = "${data.info.chat_id}">
                                         <img src="./images/${data.info.icon}.png"/>
                                         <div class="name">
@@ -216,24 +256,5 @@ $(document).ready(function() {
             }
         })
     })
-
-    /*{
-        chats: [{
-            chat_id: ,
-            name: ,
-            last_msg: ,
-            last_msg_time: ,
-            is_active:
-        }],
-        title: ,
-        msgs: [{
-            is_self: ,
-            author: ,
-            author_icon: ,
-            msg: ,
-            msg_time:
-        }]
-
-    }*/
 
 });

@@ -330,6 +330,11 @@ body {
     background-color: #eee;
 }
 
+.conversation-message{
+    max-height: 35px;
+    overflow: hidden;
+}
+
 #chat{
     padding: 10px;
     border-bottom: solid 0.5px;

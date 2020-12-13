@@ -4,15 +4,17 @@ const Schema = mongoose.Schema;
 const UserSchema = new mongoose.Schema({
     user_id: {
         type: Schema.Types.ObjectId,
-        required: true
-    },
-    chat_id: {
-        type: Schema.Types.ObjectId,
-        required: true
+        required: true,
+        ref: 'User'
     },
     name: {
         type: String,
         required: true
+    },
+    chat_id: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'Chat'
     },
     message: {
         type: String,
