@@ -61,6 +61,7 @@ app.use(function(req, res, next) {
 app.use("/", require("./routes/index.js"));
 app.use("/users", require("./routes/users.js"));
 app.use("/message", require("./routes/message.js"));
+app.use("/chat", require("./routes/chat.js"));
 app.use(express.static("public"));
 
 io.on("connection", function(socket) {

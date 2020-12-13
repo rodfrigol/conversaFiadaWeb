@@ -13,6 +13,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  icon: {
+    type: Number,
+    default: 1
+  },
   date: {
     type: Date,
     default: Date.now

@@ -1,33 +1,83 @@
+var global_chat = {
+    chats: [],
+    title: '',
+    msgs: []
+}
+
 function scrollDown(id) {
     var el = document.getElementById(id);
     el.scrollTop = el.scrollHeight;
 }
 
+function rightArrowClick(){
+    arrowClick(1)
+}
+
+function leftArrowClick(){
+    arrowClick(-1)
+}
+
+function enterChat(e){
+    $.ajax({
+        url: '/chat/enter',
+        type: 'post',
+        data: {data:e.getAttribute('value')},
+        dataType: 'json',
+        success: function (data) {
+            if (data.length === 0){
+                alert("Successfully joined the chat")
+                window.location.reload()
+            }else{
+                alert(data[0])
+            }
+        }
+    });
+}
+
+function arrowClick(side){
+    $.ajax({
+        url: '/users/changeicon',
+        type: 'post',
+        data: {data:side},
+        dataType: 'json',
+        success: function (data) {
+            $("#iconimg").attr("src","/images/"+data+".png");
+            $("#iconimg").attr("alt",data);
+        }
+    });
+}
+
 $(document).ready(function() {
     var socket = io.connect();
 
+    function changeChatToElem(el){
+        $(".selected").removeClass("selected");
+        $(el).addClass("selected");
+        var sala = $(el).find(".name").text();
+        sala = sala.replaceAll(' ', '').replace(/\n/g,'');
+        socket.emit("entrar sala", sala);
+
+        document.getElementById("chat-message-list").innerHTML = ""
+
+        $("#chat-title > span").text(el.children[1].innerText)
+
+        $.get('message/get?chat_id=' + $('.selected').attr('value'), (data) => {
+            document.getElementById("chat-message-list").innerHTML = data
+            document.getElementById(
+                "chat-message-list"
+            ).scrollTop = document.getElementById("chat-message-list").scrollHeight;
+        })
+    }
+    
+    function changeChat(e){
+        var selected = $(".selected")[0]
+        if (!($.contains(selected, e.target) || selected == e.target)){
+            changeChatToElem(this)
+        }
+    }
+
     $(".participant").each(function() {
-        $(this).click(function(e) {
-            var selected = $(".selected")[0]
-            if (!($.contains(selected, e.target) || selected == e.target)){
-                $(".selected").removeClass("selected");
-                $(this).addClass("selected");
-                var sala = $(this).find(".name").text();
-                sala = sala.replaceAll(' ', '').replace(/\n/g,'');
-                socket.emit("entrar sala", sala);
-
-                document.getElementById("chat-message-list").innerHTML = ""
-
-                document.getElementById("chat-title").textContent = this.children[1].innerText
-
-                $.get('message/get?chat_id=' + $('.selected').attr('value'), (data) => {
-                    document.getElementById("chat-message-list").innerHTML = data
-                    document.getElementById(
-                        "chat-message-list"
-                    ).scrollTop = document.getElementById("chat-message-list").scrollHeight;
-                })
-            }
-        });
+        $(this).click(changeChat);
     });
 
     $("#chat-form").submit(function(e) {
@@ -69,4 +119,121 @@ $(document).ready(function() {
     });
 
     scrollDown("chat-message-list");
+
+    $("#goChat").click(()=>{
+        $("#dashboard-container").hide()
+        $("#chat-container").css("display", "grid");
+    })
+
+    $("#goDashboard").click(()=>{
+        $("#dashboard-container").show()
+        $("#chat-container").hide()
+    })
+
+    $("#create-public-submit").click(()=>{
+        var name = $("#create-public-input").val()
+        if (name==''){
+            alert("Insert a name")
+        }
+        $.ajax({
+            url: '/chat/create',
+            type: 'post',
+            data: {data:name},
+            dataType: 'json',
+            success: function (data) {
+                if (data.length === 0){
+                    alert("Chat created successfully")
+                    window.location.reload()
+                }else{
+                    alert(data[0])
+                }
+            }
+        });
+    })
+
+    $("#create-pvts-submit").click(()=>{
+        var name = $("#create-pvt-input").val()
+        if (name==''){
+            alert("Insert an email")
+        }
+        $.ajax({
+            url: '/chat/create_pvt',
+            type: 'post',
+            data: {data:name},
+            dataType: 'json',
+            success: function (data) {
+                if (data.errors.length === 0){
+                    $("#dashboard-container").hide()
+                    $("#chat-container").css("display", "grid");
+                    if(data.info.new){
+                        $(".selected").removeClass("selected");
+
+                        var html = `<div class="participant selected" value = "${data.info.chat_id}">
+                                        <img src="./images/${data.info.icon}.png"/>
+                                        <div class="name">
+                                            ${data.info.name}
+                                        </div>
+                                        <div class="created-date">
+                                        </div>
+                                        <div class="conversation-message">
+                                        </div>
+                                    </div>`
+                        
+                        var el = $(html)
+                        el.click(changeChat)
+                        $("#participants-list").append(el)
+                        $("#chat-title > span").text(data.info.name)
+                        document.getElementById("chat-message-list").innerHTML = ""
+                    }else{
+                        changeChatToElem($(".participant[value="+data.info.chat_id+"]")[0])
+                    }
+                }else{
+                    alert(data.errors[0])
+                }
+            }
+        });
+    })
+    $("#search-input").on("input focus", (e) => {
+        $.ajax({
+            url: '/chat/search',
+            type: 'post',
+            data: {data:e.target.value},
+            dataType: 'json',
+            success: function (data) {
+                var html = ''
+
+                data.forEach((chat)=>{
+                    html += `<div id='chat' value='${chat._id}' onclick='enterChat(this)'>
+                                    <div id='chat-name'>${chat.name}</div>
+                                    <div id='chat-info'>
+                                        <i class="fa fa-user" style="font-size: 20px;color: green;padding-right:5px"></i>
+                                        <span style="font-size: 20px;">${chat.count}</span>
+                                    </div>
+                                </div>`
+                })
+                
+                $("#chats")[0].innerHTML = html
+            }
+        })
+    })
+
+    /*{
+        chats: [{
+            chat_id: ,
+            name: ,
+            last_msg: ,
+            last_msg_time: ,
+            is_active:
+        }],
+        title: ,
+        msgs: [{
+            is_self: ,
+            author: ,
+            author_icon: ,
+            msg: ,
+            msg_time:
+        }]
+
+    }*/
+
 });

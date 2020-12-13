@@ -94,4 +94,14 @@ router.get("/logout", (req, res) => {
     res.redirect("/users/login");
 });
 
+router.post("/changeicon", (req, res) => {
+    User.findById(req.user._id).then((user) => {
+        var newIcon = (user.icon + parseInt(req.body.data))
+        newIcon = (newIcon == 9) ? 1 : ((newIcon == 0)? 8 : newIcon)
+        user.icon = newIcon
+        user.save()
+        res.end(newIcon.toString())
+    })
+});
+
 module.exports = router;

@@ -7,11 +7,12 @@
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
         <script type="text/javascript" src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/js/chat.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     <body>
         <div id="chat-container">
             <div id="search-container">
-                <input type="text" placeholder="Search" />
+                <i class="fa fa-chevron-left arrow" id='goDashboard' style="font-size: 40px;color: grey;cursor:pointer;"></i>
             </div>
             <div id="participants-list">
                 <% chat.forEach(function(chat, index){ %>
@@ -20,16 +21,25 @@
                     <% } else { %>
                         <div class="participant" value = "<%= chat._id %>">
                     <% } %>
+                    <% if (chat.is_pvt){ %>
+                        <img src="./images/<%= chat.icon %>.png"/>
+                        <div class="name">
+                            <%= chat.name %>
+                        </div>
+                        <div class="created-date">
+                        </div>
+                        <div class="conversation-message">
+                        </div>
+                    <% } else { %>
                         <img src="./images/groups2.png"/>
                         <div class="name">
                             <%= chat.name %>
                         </div>
                         <div class="created-date">
-                            <%= chat.name %>
                         </div>
                         <div class="conversation-message">
-                            <%= chat.name %>
                         </div>
+                    <% } %>
                     </div>
                 <% }) %>
 
@@ -40,7 +50,7 @@
                 </a>
             </div>
             <div id="chat-title">
-                <span><%= chat[0].name %></span>
+                <span><% if(chat.length>0){ %><%= chat[0].name %><% } %></span>
             </div>
             <div id="chat-message-list">
 
@@ -86,6 +96,7 @@
                 
             </div>
             <div id="top-space2">
+                <i class="fa fa-chevron-right arrownext" id='goChat' style="font-size: 40px;color: grey;cursor:pointer;"></i>
             </div>
             <div id = 'create-chat'>
                 <div id = 'create-public'>
@@ -98,7 +109,7 @@
                     </div>
                 </div>
                 <div id = 'create-private'>
-                    <div class='create-title'>Search User</div>
+                    <div class='create-title'>Chat to User</div>
                     <div class='center'>
                         <div id='create-pvt-container'>
                             <input type="text" placeholder="Type User Email" id="create-pvt-input" class='input' autocomplete="off"/>
@@ -109,15 +120,22 @@
                 <div id = 'create-icon'>
                     <div class='create-title'>Profile Icon</div>
                     <div class='center'>
-                        <div id='create-pvt-container'>
-                            <input type="text" placeholder="Type User Email" id="create-pvt-input" class='input' autocomplete="off"/>
-                            <input type="submit" value= "Chat" id="create-pvts-submit" class='submit'>
-                        </div>
+                        <i class="fa fa-chevron-left arrow" onclick='leftArrowClick()' style="font-size: 20px;"></i>
+                        <img src= '/images/<%= user.icon %>.png' id='iconimg' width='80px' alt = <%= user.icon %>>
+                        <i class="fa fa-chevron-right arrow" onclick='rightArrowClick()' style="font-size: 20px;"></i>
                     </div>
                 </div>
             </div>
             <div id = 'search-chat'>
-                
+                <div class='search-title'>Search Chat</div>
+                <div class='center'>
+                    <div id='search-chat-container'>
+                        <input type="text" placeholder="Type Chat Name" id='search-input' class='input' autocomplete="off"/>
+                        <div id='chats'>
+                            
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </body>
