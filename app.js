@@ -6,8 +6,8 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const socket = require("socket.io");
 const http = require("http");
+const expressSanitizer = require('express-sanitizer');
 
-const fs = require("fs");
 const app = express();
 const server = http.createServer(app);
 var PORT = process.env.PORT || 5000;
@@ -56,6 +56,9 @@ app.use(function(req, res, next) {
     res.locals.error = req.flash("error");
     next();
 });
+
+app.use(express.json());
+app.use(expressSanitizer());
 
 // Routes
 app.use("/", require("./routes/index.js"));

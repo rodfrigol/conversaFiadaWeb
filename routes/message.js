@@ -2,12 +2,15 @@ const express = require("express");
 const router = express.Router();
 const Messages = require("../models/Messages");
 const Chat = require("../models/Chat");
+const { ensureAuthenticated, forwardAuthenticated } = require("../config/auth");
+const User_chat = require("../models/User_chat");
 
-router.post("/send", (req, res) => {
+router.post("/send", ensureAuthenticated, (req, res) => {
+    const msg = req.sanitize(req.body.message);
     const newMsg = new Messages({
         user_id: req.user._id,
         chat_id: req.body.chat_id,
-        message: req.body.message,
+        message: msg,
         name: req.user.name
     });
     newMsg.save(()=>{
@@ -25,23 +28,56 @@ router.post("/send", (req, res) => {
     })
 });
 
-router.get("/get", (req, res) => {
+router.get("/get", ensureAuthenticated, (req, res) => {
     var chat_id = req.url.substring(req.url.indexOf('=') + 1)
-    Messages.find({ chat_id: chat_id }).sort({date: "asc"})
-    .populate('user_id')
-    .then((messages) => {
 
-        var resp = []
-        messages.forEach((msg) => {
-            resp.push({
-                author: msg.name,
-                content: msg.message,
-                date: msg.date.toLocaleString(),
-                icon: msg.user_id.icon,
-                is_self: msg.user_id.email == req.user.email
+    Chat.findById(chat_id).then(chat => {
+        //chat nao existe
+        if (!chat) return res.end()
+        //chat privado
+        if (chat.is_pvt){
+            //se o chat é privado, deve conter o email de quem faz a requisição
+            if (!(chat.pvt1 === req.user.email || chat.pvt2 === req.user.email)) 
+                return res.end()
+            Messages.find({ chat_id: chat_id }).sort({date: "asc"})
+            .populate('user_id')
+            .then((messages) => {
+        
+                var resp = []
+                messages.forEach((msg) => {
+                    resp.push({
+                        author: msg.name,
+                        content: msg.message,
+                        date: msg.date.toLocaleString(),
+                        icon: msg.user_id.icon,
+                        is_self: msg.user_id.email == req.user.email
+                    })
+                })
+                res.end(JSON.stringify(resp))
+        
             })
-        })
-        res.end(JSON.stringify(resp))
+        }else{
+            //se o chat nao é privado, temos que verificar a tabela user_chat
+            User_chat.findOne({user_id: req.user._id, chat_id: chat_id}).then(uc => {
+                if (!uc) return res.end()
+                Messages.find({ chat_id: chat_id }).sort({date: "asc"})
+                .populate('user_id')
+                .then((messages) => {
+            
+                    var resp = []
+                    messages.forEach((msg) => {
+                        resp.push({
+                            author: msg.name,
+                            content: msg.message,
+                            date: msg.date.toLocaleString(),
+                            icon: msg.user_id.icon,
+                            is_self: msg.user_id.email == req.user.email
+                        })
+                    })
+                    res.end(JSON.stringify(resp))
+                })
+            })
+        }
 
     })
 })

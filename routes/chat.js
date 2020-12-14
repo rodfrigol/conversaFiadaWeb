@@ -4,8 +4,9 @@ const Chat = require("../models/Chat");
 const UserChat = require("../models/User_chat");
 const User = require("../models/User");
 const { response } = require("express");
+const { ensureAuthenticated, forwardAuthenticated } = require("../config/auth");
 
-router.post('/create', function(req, res){
+router.post('/create', ensureAuthenticated, function(req, res){
     errors = []
     var nome = req.body.data
     Chat.find({name: nome}).then((chat) => {
@@ -29,7 +30,7 @@ router.post('/create', function(req, res){
     })
 })
 
-router.post('/create_pvt', function(req, res){
+router.post('/create_pvt', ensureAuthenticated, function(req, res){
     data = {
         errors : [],
         info: {}
@@ -83,7 +84,7 @@ router.post('/search', (req, res) => {
 })
 
 
-router.post('/enter', (req, res) => {
+router.post('/enter', ensureAuthenticated, (req, res) => {
     errors = []
     UserChat.find({user_id: req.user._id, chat_id: req.body.data}).then((uc) => {
         if (uc.length > 0){

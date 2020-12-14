@@ -51,10 +51,6 @@ $(window).ready(function() {
         $(".selected").removeClass("selected");
         $(el).addClass("selected");
 
-        /*var sala = $(el).find(".name").text();
-        sala = sala.replaceAll(' ', '').replace(/\n/g,'');
-        socket.emit("entrar sala", sala);*/
-
         document.getElementById("chat-message-list").innerHTML = ""
 
         $("#chat-title > span").text(el.children[1].innerText)
