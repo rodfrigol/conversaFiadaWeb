@@ -78,6 +78,19 @@ router.post("/register", (req, res) => {
     }
 });
 
+router.get('/auth/google',
+  passport.authenticate('google', { scope:
+      [ 'email' , 'profile'] }
+));
+
+router.get('/auth/google/callback', (req, res, next) => {
+    passport.authenticate('google', {
+        successRedirect: '/dashboard',
+        failureRedirect: '/users/login',
+        failureFlash: true
+    })(req, res, next)
+});
+
 // Login
 router.post("/login", (req, res, next) => {
     passport.authenticate("local", {

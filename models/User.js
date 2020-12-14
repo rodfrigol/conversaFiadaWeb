@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
+    default: null
   },
   icon: {
     type: Number,
@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now
+  },
+  googleId: {
+    type: String,
+    default: null
   }
 });
 

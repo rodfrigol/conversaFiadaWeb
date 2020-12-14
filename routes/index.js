@@ -9,6 +9,10 @@ const User = require("../models/User");
 // Welcome Page
 router.get("/", forwardAuthenticated, (req, res) => res.render("welcome"));
 
+router.get("/teste", (req, res) => {
+    res.end(JSON.stringify(req.user))
+})
+
 // Dashboard
 router.get("/dashboard", ensureAuthenticated, (req, res) => {
     var global_chat = {
