@@ -12,7 +12,15 @@ router.post("/send", (req, res) => {
     });
     newMsg.save(()=>{
         Chat.updateOne({ _id: req.body.chat_id}, {last_msg: newMsg._id}).then(()=>{
-            res.end(JSON.stringify(newMsg))
+            var n = {
+                user_id: newMsg.user_id,
+                chat_id: newMsg.chat_id,
+                message: newMsg.message,
+                name: newMsg.name,
+                date: newMsg.date,
+                icon: req.user.icon
+            }
+            res.end(JSON.stringify(n))
         })
     })
 });

@@ -9,11 +9,6 @@
         <script type="text/javascript" src="/js/chat.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
-    <script>
-        var txt = document.createElement("textarea");
-        txt.innerHTML = '<%= JSON.stringify(global_chat) %>';
-        global_chat = JSON.parse(txt.value)
-    </script>
     <body>
         <div id="chat-container">
             <div id="search-container">

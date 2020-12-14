@@ -65,21 +65,14 @@ app.use("/chat", require("./routes/chat.js"));
 app.use(express.static("public"));
 
 io.on("connection", function(socket) {
-    socket.join("home room");
-
     socket.on("enviar mensagem", function(mensagem, callback) {
-        var sala = io.sockets.adapter.sids[socket.id];
-        sala = Object.keys(sala)[Object.keys(sala).length - 1];
+        var sala = mensagem.chat_id
 
         socket.broadcast.to(sala).emit("atualizar mensagens", mensagem);
         callback();
     });
 
-    socket.on("entrar sala", function(sala) {
-        var rooms = io.sockets.adapter.sids[socket.id];
-        for (var room in rooms) {
-            socket.leave(room);
-        }
-        socket.join(sala);
+    socket.on("entrar sala", function(salas) {
+        socket.join(salas)
     });
 });
