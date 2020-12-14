@@ -24,3 +24,7 @@ $ npm run dev
 
 Open "config/keys.js" and add your MongoDB URI, local or Atlas
 (Padeiro already edited this)
+
+<br />
+Check the app at <br />
+https://conversa-fiada.herokuapp.com/
