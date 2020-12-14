@@ -35,7 +35,7 @@ module.exports = function(passport) {
   passport.use(new GoogleStrategy({
       clientID:     '77508320355-cghkms9dv14jasunauu5p67kv6885kg2.apps.googleusercontent.com',
       clientSecret: '7xmWrUW9_kluJHLdgEdLloFe',
-      callbackURL: "http://localhost:5000/users/auth/google/callback",
+      callbackURL: "https://conversa-fiada.herokuapp.com/users/auth/google/callback",
       passReqToCallback   : true
     },
     function(request, accessToken, refreshToken, profile, done) {
