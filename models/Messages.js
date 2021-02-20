@@ -23,6 +23,10 @@ const UserSchema = new mongoose.Schema({
     date: {
         type: Date,
         default: Date.now
+    },
+    user_img: {
+        type: String,
+        required: true
     }
 });
 
